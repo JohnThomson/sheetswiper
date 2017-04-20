@@ -299,7 +299,45 @@ namespace SheetSwipe
 
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            new AboutBox1().ShowDialog();
+            var path = Path.GetTempFileName();
+            try
+            {
+                // SILAboutBox needs a file, but SheetSwiper has no obvious mechanism set up to distribute files.
+                // So we'll just make a temp one for the about box and then delete it.
+                File.WriteAllText(path,
+@"<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' /><link rel='stylesheet' type='text/css' href='aboutBox.css' />
+
+<h3>Copyright 2011-2016 <a href='http://sil.org'>SIL International</a></h3>
+
+<h3>License</h3>
+
+<p>Open source (<a href='http://sil.mit-license.org/'>MIT License</a>).</p>
+
+<h3>Credits</h3>
+
+<p>John Hatton&nbsp;(<a href='http://sil.org'>SIL International</a>) :&nbsp;Program Manager, Design, Programming
+</p>
+
+<h3>SheetSwiper relies on the following open source works of others:</h3>
+<ul>
+    <li>Liu JunFeng's <a href='https://code.google.com/archive/p/excellibrary/'>ExcelReader</a> for reading Excel files</li>
+</ul>
+<h3>You can check for the latest version <a href='http://projects.palaso.org/projects/sheetswiper/files'>here</a></h3>
+");
+                using (var dlg = new SIL.Windows.Forms.Miscellaneous.SILAboutBox(path))
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            finally
+            {
+                if (File.Exists(path))
+                    try
+                    {
+                        File.Delete(path);
+                    }
+                    catch (Exception) { }
+            }
         }
 
         private void OnFontChooser_SelectedIndexChanged(object sender, EventArgs e)
